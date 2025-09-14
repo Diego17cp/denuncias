@@ -68,8 +68,8 @@ class DenunciadosModel extends Model
     protected $cleanValidationRules = true;
 
 
-    public function insertDenunciado(array $data)
+    public function getByDocument(string $doc)
     {
-        return $this->insert($data);
+        return $this->where('documento', $doc)->first();
     }
 }

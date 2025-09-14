@@ -38,13 +38,13 @@ class DenunciantesModel extends Model
     protected $validationRules = [
         'nombre'           => 'permit_empty|min_length[3]|max_length[255]',
         'razon_social'     => 'permit_empty|max_length[150]',
-        'documento'        => 'required|min_length[8]|max_length[20]',
-        'tipo_documento'   => 'required|in_list[DNI,CE,RUC]',
+        'documento' => 'permit_empty|min_length[8]|max_length[20]',
+        'tipo_documento' => 'permit_empty|in_list[DNI,CE,RUC]',
         'direccion'        => 'permit_empty|max_length[255]',
         'distrito'         => 'permit_empty|max_length[100]',
         'provincia'        => 'permit_empty|max_length[100]',
         'departamento'     => 'permit_empty|max_length[100]',
-        'email'            => 'required|valid_email|max_length[150]',
+        'email' => 'permit_empty|valid_email|max_length[150]',
         'telefono'         => 'permit_empty|max_length[15]|min_length[7]',
         'celular'          => 'permit_empty|max_length[15]|min_length[7]',
         'sexo'             => 'permit_empty|in_list[M,F,O]',
@@ -109,8 +109,8 @@ class DenunciantesModel extends Model
     protected $cleanValidationRules = true;
 
 
-    public function insertDenunciante(array $data)
+    public function getByDocument(string $doc)
     {
-        return $this->insert($data);
+        return $this->where('documento', $doc)->first();
     }
 }

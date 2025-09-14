@@ -10,8 +10,9 @@ use App\Models\Denuncias\DenunciantesModel;
 use App\Models\Denuncias\MotivosModel;
 use App\Models\Denuncias\SeguimientoDenunciasModel;
 use CodeIgniter\Config\Services;
+use CodeIgniter\RESTful\ResourceController;
 
-class FormularioController extends BaseController
+class FormularioController extends ResourceController
 {
     private $adjuntosModel;
     private $denunciadosModel;
@@ -20,6 +21,9 @@ class FormularioController extends BaseController
     private $motivosModel;
     private $seguimientoDenunciasModel;
     private $email;
+    protected $format = 'json';
+
+
     function __construct()
     {
         $this->adjuntosModel = new AdjuntosModel();
@@ -54,17 +58,17 @@ class FormularioController extends BaseController
         } while ($model->where('id', $uuid)->first());
         return $uuid;
     }
-    public function generateTrackingCode()
-    {
-        do {
-            $trackingCode = 'TD' . strtoupper(bin2hex(random_bytes(9)));
-        } while ($this->denunciasModel->where('tracking_code', $trackingCode)->first());
-        return $trackingCode;
-    }
+    // public function generateTrackingCode()
+    // {
+    //     do {
+    //         $trackingCode = 'TD' . strtoupper(bin2hex(random_bytes(9)));
+    //     } while ($this->denunciasModel->where('tracking_code', $trackingCode)->first());
+    //     return $trackingCode;
+    // }
     public function correo($correo, $code)
     {
         // Cargar la librería de correo
-        $this->email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
+        $this->email->setFrom('munijloenlinea@gmail.com',   'Municipalidad Distrital de José Leonardo Ortiz');
         $this->email->setTo($correo);
         $this->email->setSubject('Código de Seguimiento de Denuncia');
         $this->email->setMessage("
@@ -93,147 +97,18 @@ class FormularioController extends BaseController
 
         return $this->email->send();
     }
-    function create()
+
+public function create()
     {
-        $db = \Config\Database::connect();
-        $dataJson = $this->request->getPost('data');
-        $formData = json_decode($dataJson, true);
-
-        $denunciante = $formData['denunciante'] ?? null;
-        $denunciado  = $formData['denunciado'] ?? null;
-        $denuncia    = $formData['denuncia'] ?? null;
-
-        $code = $this->generateTrackingCode();
-        $id_denunciante = null;
-        $id_denunciado  = null;
-        $id_denuncia    = null;
-
-        // Start transaction
-        $db->transStart();
-
-        // Insert denunciante (mapear campos a los que el modelo espera)
-        if ($denunciante) {
-            $denuncianteData = [
-                'nombre'        => $denunciante['nombres'] ?? null,
-                'documento'     => $denunciante['numero_documento'] ?? null,
-                'tipo_documento'=> strtoupper($denunciante['tipo_documento'] ?? null),
-                'email'         => $denunciante['email'] ?? null,
-                'telefono'      => $denunciante['telefono'] ?? null,
-                'celular'       => $denunciante['celular'] ?? ($denunciante['telefono'] ?? null),
-                'sexo'          => $denunciante['sexo'] ?? null,
-                'direccion'     => $denunciante['direccion'] ?? null,
-                'distrito'      => $denunciante['distrito'] ?? null,
-                'provincia'     => $denunciante['provincia'] ?? null,
-                'departamento'  => $denunciante['departamento'] ?? null,
-            ];
-
-            $this->denunciantesModel->insertDenunciante($denuncianteData);
-            if ($errors = $this->denunciantesModel->errors()) {
-                $db->transRollback();
-                return $this->response->setJSON(['success' => false, 'message' => 'Error creando denunciante', 'errors' => $errors])->setStatusCode(422);
-            }
-            $id_denunciante = $this->denunciantesModel->getInsertID();
-        }
-
-        // Insert denunciado (mapear campos)
-        if ($denunciado) {
-            $denunciadoData = [
-                'nombre'             => $denunciado['nombre'] ?? null,
-                'documento'          => $denunciado['numero_documento'] ?? null,
-                'tipo_documento'     => strtoupper($denunciado['tipo_documento'] ?? null),
-                'representante_legal'=> $denunciado['representante_legal'] ?? null,
-                'razon_social'       => $denunciado['razon_social'] ?? null,
-                'direccion'          => $denunciado['direccion'] ?? null,
-                'celular'            => $denunciado['celular'] ?? ($denunciado['telefono'] ?? null),
-            ];
-
-            $this->denunciadosModel->insertDenunciado($denunciadoData);
-            if ($errors = $this->denunciadosModel->errors()) {
-                $db->transRollback();
-                return $this->response->setJSON(['success' => false, 'message' => 'Error creando denunciado', 'errors' => $errors])->setStatusCode(422);
-            }
-            $id_denunciado = $this->denunciadosModel->getInsertID();
-        }
-
-        // Insert denuncia (mapear campos)
-        if ($denuncia) {
-            $denunciaData = [
-                'tracking_code'   => $code,
-                'es_anonimo'      => isset($denuncia['es_anonimo']) ? (int)$denuncia['es_anonimo'] : 0,
-                'denunciante_id'  => $id_denunciante,
-                'denunciado_id'   => $id_denunciado,
-                'estado'          => 'registrado',
-                'fecha_incidente' => $denuncia['fecha_incidente'] ?? null,
-                'lugar'           => $denuncia['lugar'] ?? null,
-                'motivo_id'       => $denuncia['motivo_id'] ?? null,
-                'motivo_otro'     => $denuncia['motivo_otro'] ?? null,
-                'descripcion'     => $denuncia['descripcion'] ?? null,
-                'area'            => $denuncia['area'] ?? 'corrupcion',
-            ];
-
-            $this->denunciasModel->insertDenuncia($denunciaData);
-            if ($errors = $this->denunciasModel->errors()) {
-                $db->transRollback();
-                return $this->response->setJSON(['success' => false, 'message' => 'Error creando denuncia', 'errors' => $errors])->setStatusCode(422);
-            }
-            $id_denuncia = $this->denunciasModel->getInsertID();
-        }
-
-        // Si no se creó la denuncia, rollback y error
-        if (empty($id_denuncia) || $id_denuncia == 0) {
-            $db->transRollback();
-            return $this->response->setJSON(['success' => false, 'message' => 'No se pudo generar ID de denuncia'])->setStatusCode(500);
-        }
-
-        // Subir archivos e insertar adjuntos
+        $data  = $this->request->getPost();
         $files = $this->request->getFiles();
-        $uploadPath = FCPATH . 'uploads/' . $id_denuncia;
-        if (!is_dir($uploadPath)) {
-            mkdir($uploadPath, 0777, true);
-        }
-        foreach ($files as $file) {
-            if ($file->isValid() && !$file->hasMoved()) {
-                $newName = $file->getRandomName();
-                $file->move($uploadPath, $newName);
-                $this->adjuntosModel->insertAdjunto([
-                    'denuncia_id' => $id_denuncia,
-                    'file_path'   => 'uploads/' . $id_denuncia . '/' . $newName,
-                ]);
-                if ($errors = $this->adjuntosModel->errors()) {
-                    $db->transRollback();
-                    return $this->response->setJSON(['success' => false, 'message' => 'Error guardando adjunto', 'errors' => $errors])->setStatusCode(422);
-                }
-            }
-        }
 
-        // Insert seguimiento
-        // $this->seguimientoDenunciasModel->insertSeguimiento([
-        //     'denuncia_id' => $id_denuncia,
-        //     'administrador_id' => null,
-        //     'estado' => 'registrado',
-        //     'comentario' => 'Denuncia registrada',
-        // ]);
-        // if ($errors = $this->seguimientoDenunciasModel->errors()) {
-        //     $db->transRollback();
-        //     return $this->response->setJSON(['success' => false, 'message' => 'Error creando seguimiento', 'errors' => $errors])->setStatusCode(422);
-        // }
+        $result = $this->denunciasModel->createDenuncia($data, $files);
 
-        $db->transComplete();
-        if ($db->transStatus() === false) {
-            return $this->response->setJSON(['success' => false, 'message' => 'Error en transacción'])->setStatusCode(500);
-        }
-
-        // Enviar correo si aplica (no parte de la transacción)
-        if (!$denuncia['es_anonimo'] ?? false) {
-            $this->correo($denunciante['email'] ?? null, $code);
-        }
-
-        return $this->response->setJSON([
-            'success' => true,
-            'message' => 'Denuncia registrada correctamente',
-            'tracking_code' => $code,
-        ]);
+        return $this->respond($result);
     }
+
+    
     function query($code)
     {
         // Fetch denuncia by tracking code
@@ -254,6 +129,7 @@ class FormularioController extends BaseController
             'data' => $seguimientos
         ]);
     }
+
     public function checkConnection()
     {
         try {
@@ -272,4 +148,5 @@ class FormularioController extends BaseController
             ]);
         }
     }
+
 }
