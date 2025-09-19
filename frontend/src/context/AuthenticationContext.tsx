@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 			const response = await axios.post(
 				`${BASE_URL}/login`,
 				{
-					dni_admin: dni,
+					dni: dni,
 					password: password,
 				},
 				{ withCredentials: true }
