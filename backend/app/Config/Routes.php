@@ -130,7 +130,7 @@ $routes->group('/', ['filter' => 'cors'], function ($routes) {
     });
 
     $routes->group('corrupcion', ['namespace' => 'App\Controllers\denuncias_corrupcion'], function ($routes) {
-        $routes->get('tracking/(:alphanum)', 'Denuncias\Client\FormularioController::query/$1');
+        $routes->get('api/tracking/(:alphanum)', 'Denuncias\Client\FormularioController::query/$1');
         $routes->group('form', function ($routes) {
             $routes->get('motivos', 'Denuncias\Client\FormularioController::index');
             $routes->post('create', 'Denuncias\Client\FormularioController::create');
