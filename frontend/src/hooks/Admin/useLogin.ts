@@ -84,12 +84,12 @@ export const useLogin = () => {
 	}, [numeroDocumento]);
 
 	useEffect(() => {
-		if (numeroDocumento.length === 8 && nombre && password.length >= 8) {
+		if (numeroDocumento.length === 8 && password.length >= 8) {
 			setIsDisabled(false);
 		} else {
 			setIsDisabled(true);
 		}
-	}, [numeroDocumento, nombre, password]);
+	}, [numeroDocumento, password]);
 
 	return {
 		numeroDocumento,

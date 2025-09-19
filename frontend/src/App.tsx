@@ -29,7 +29,7 @@ const NotFound = lazy(() => import("./pages/404"));
 
 function App() {
 	return (
-		<BrowserRouter basename="/corrupcion/">
+		<BrowserRouter basename="/">
 			<AuthProvider>
 				<Suspense
 					fallback={

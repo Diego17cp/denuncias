@@ -66,7 +66,7 @@ export const useAdminDenunciasRecibidas = (itemsPerPage: number = 10) => {
 	} = usePagination(denuncias, itemsPerPage);
 
 	const fetchDenunciasRecibidas = useCallback(async () => {
-		if (!user?.dni_admin) {
+		if (!user?.dni) {
 			setError("No se pudo obtener el DNI del administrador");
 			setLoading(false);
 			return;
@@ -75,7 +75,7 @@ export const useAdminDenunciasRecibidas = (itemsPerPage: number = 10) => {
 			setLoading(true);
 			const response = await authApi.get(`/recibida`, {
 				params: {
-					dni_admin: user.dni_admin,
+					dni: user.dni,
 				},
 			});
 			if (response.data && Array.isArray(response.data)) {
@@ -115,7 +115,7 @@ export const useAdminDenunciasRecibidas = (itemsPerPage: number = 10) => {
 		} finally {
 			setLoading(false);
 		}
-	}, [user?.dni_admin]);
+	}, [user?.dni]);
 	useEffect(() => {
 		fetchDenunciasRecibidas();
 	}, [fetchDenunciasRecibidas]);
@@ -162,7 +162,7 @@ export const useAdminDenunciasRecibidas = (itemsPerPage: number = 10) => {
 	};
 	const submitUpdateDenuncia = useCallback(
 		async (tracking_code: string) => {
-			if (!user?.dni_admin) {
+			if (!user?.dni) {
 				toast.error("No se pudo identificar al administrador");
 				return;
 			}
@@ -175,7 +175,7 @@ export const useAdminDenunciasRecibidas = (itemsPerPage: number = 10) => {
 				const response = await authApi.get("/updateDenuncia", {
 					params: {
 						tracking_code,
-						dni_admin: user?.dni_admin,
+						dni_admin: user?.dni,
 						comentario: commentInputs[tracking_code] || "",
 						estado: stateRows[tracking_code],
 					},
@@ -216,11 +216,11 @@ export const useAdminDenunciasRecibidas = (itemsPerPage: number = 10) => {
 				setLoading(false);
 			}
 		},
-		[user?.dni_admin, stateRows, commentInputs, authApi]
+		[user?.dni, stateRows, commentInputs, authApi]
 	);
 	const downloadAdjuntos = useCallback(
 		async (tracking_code: string) => {
-			if (!user?.dni_admin) {
+			if (!user?.dni) {
 				toast.error("No se pudo identificar al administrador");
 				return;
 			}
@@ -319,7 +319,7 @@ export const useAdminDenunciasRecibidas = (itemsPerPage: number = 10) => {
 				}));
 			}
 		},
-		[user?.dni_admin]
+		[user?.dni]
 	);
 	return {
 		denuncias,

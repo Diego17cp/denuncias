@@ -3,7 +3,7 @@ import { useAuthContext } from "../../hooks/Admin/useAuthContext";
 
 export const DashboardAdmin = () => {
 	const { user } = useAuthContext();
-	const userRole = user?.categoria || "";
+	const userRole = user?.rol || "";
 	const MENU_ITEMS_DASHBOARD = [
 		{
 			title: "Administrar Usuarios",
@@ -35,7 +35,7 @@ export const DashboardAdmin = () => {
 			<div className="text-center mb-8">
 				<p className="text-gray-600">
 					<span className="font-semibold">Usuario:</span>{" "}
-					{user?.nombres || ""}
+					{user?.nombre || ""}
 				</p>
 				<p className="text-gray-600">
 					<span className="font-semibold">Rol:</span>{" "}

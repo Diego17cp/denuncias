@@ -13,9 +13,9 @@ interface AuthContextProps {
 }
 
 interface User {
-	dni_admin: string;
-	categoria: string;
-	nombres: string;
+	dni: string;
+	rol: string;
+	nombre: string;
 	estado: "activo" | "inactivo" | "1" | "0";
 }
 
@@ -108,15 +108,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
 			if (response.data.roleChanged) {
 				setUser({
-					dni_admin: response.data.user.dni_admin,
-					categoria: response.data.user.categoria,
-					nombres: response.data.user.nombres || "Administrador",
-					estado: response.data.user.estado || "activo",
+					dni: response.data.user.dni	,
+					rol: response.data.user.rol,
+					nombre: response.data.user.nombre || "Administrador",
+					estado: response.data.user.estado || "1",
 				});
 
 				toast.info("Se ha actualizado tu información de usuario", {
 					description: `Tu rol ha cambiado a ${
-						response.data.user.categoria === "super_admin"
+						response.data.user.rol === "super_admin"
 							? "Super Administrador"
 							: "Administrador"
 					}`,
