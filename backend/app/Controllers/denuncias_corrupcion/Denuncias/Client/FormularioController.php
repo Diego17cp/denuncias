@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controllers\denuncias_consumidor\Denuncias\Client;
+namespace App\Controllers\denuncias_corrupcion\Denuncias\Client;
 
 use App\Controllers\BaseController;
 use App\Models\denuncias_corrupcion\Denuncias\AdjuntosModel;
