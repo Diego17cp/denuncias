@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Controllers\Denuncias\Admin;
+// 1. NAMESPACE CORREGIDO: Ahora coincide con la estructura de carpetas.
+namespace App\Controllers\denuncias_corrupcion\Denuncias\Admin;
 
 use App\Controllers\BaseController;
+use App\Models\denuncias_corrupcion\Denuncias\AdministradoresModel; // Asegúrate que el namespace de tu modelo sea correcto
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use App\Models\denuncias_corrupcion\Denuncias\AdministradoresModel;
 
 class VerificarController extends BaseController
 {
@@ -15,127 +16,115 @@ class VerificarController extends BaseController
     {
         $this->administradoresModel = new AdministradoresModel();
     }
-    //Funciones para el login y la verificación del token
+
     public function login()
     {
         $data = $this->request->getJSON(true);
-        $dni_admin = $data['dni_admin'] ?? $data->dni_admin ?? '';
-        $password = $data['password'] ?? $data->password ?? '';
-        $user = $this->administradoresModel->find($dni_admin);
 
-        // Verificar si el usuario existe
+        // CAMBIO: La columna en la BD es 'dni'
+        $dni = $data['dni'] ?? '';
+        $password = $data['password'] ?? '';
+
+        // Buscamos al usuario por DNI. El modelo debe estar configurado para usar 'dni' como clave.
+        $user = $this->administradoresModel->where('dni', $dni)->first();
+
         if (!$user) {
             return $this->response->setStatusCode(401)->setJSON(['error' => 'Usuario no encontrado']);
         }
 
-        // Verificar si el usuario está activo
-        if ($user['estado'] !== 'activo') {
-            return $this->response->setStatusCode(401)->setJSON(['error' => 'Tu cuenta ha sido desactivada. Por favor, contacta al administrador.']);
+        // CAMBIO: El estado 'activo' en la BD es '1'
+        if ($user['estado'] !== '1') {
+            return $this->response->setStatusCode(401)->setJSON(['error' => 'Tu cuenta ha sido desactivada.']);
         }
 
         if (password_verify($password, $user['password'])) {
-            $key = 'your-secret-key';
+            $key = 'your-secret-key'; // Es muy recomendable mover esta clave a un archivo de configuración (.env)
             $payload = [
                 'iat' => time(),
-                'exp' => time() + 3600,
-                'dni_admin' => $user['dni_admin'],
-                'categoria' => $user['categoria'],
-                'estado' => $user['estado']
+                'exp' => time() + 3600, // 1 hora de expiración
+                'dni' => $user['dni'], // CAMBIO: Usamos 'dni'
+                'rol' => $user['rol'], // CAMBIO: Usamos 'rol'
             ];
             $token = JWT::encode($payload, $key, 'HS256');
+
+            // Enviar el token como una cookie HttpOnly para mayor seguridad
             $this->response->setCookie([
-                'name' => 'auth_token',
-                'value' => $token,
-                'expire' => time() + 3600,
-                'path' => '/',
-                'secure' => false, // Cambia a true si usas HTTPS
+                'name'     => 'auth_token',
+                'value'    => $token,
+                'expire'   => time() + 3600,
+                'path'     => '/',
+                'secure'   => false, // Cambiar a true en producción con HTTPS
                 'httponly' => true,
                 'samesite' => 'Strict'
             ]);
+
             return $this->response->setJSON([
                 'success' => true,
+                'message' => 'Inicio de sesión exitoso.',
                 'user' => [
-                    'dni_admin' => $user['dni_admin'],
-                    'nombres' => $user['nombres'] ?? 'Administrador',
-                    'categoria' => $user['categoria'],
-                    'estado' => $user['estado']
+                    'dni'    => $user['dni'],
+                    'nombre' => $user['nombre'], // CAMBIO: Usamos 'nombre'
+                    'rol'    => $user['rol'],    // CAMBIO: Usamos 'rol'
                 ],
             ]);
         }
+        
         return $this->response->setStatusCode(401)->setJSON(['error' => 'Contraseña incorrecta']);
     }
+
     public function getAdminInfo()
     {
         $token = $this->request->getCookie('auth_token');
         if (!$token) {
             return $this->response->setStatusCode(401)->setJSON(['error' => 'No autorizado', 'forceLogout' => true]);
         }
+
         try {
             $key = 'your-secret-key';
             $decoded = JWT::decode($token, new Key($key, 'HS256'));
-            $dni_admin = $decoded->dni_admin;
+            
+            $dni = $decoded->dni; // CAMBIO: Leemos 'dni' del token
+            $user = $this->administradoresModel->where('dni', $dni)->first();
 
-            $user = $this->administradoresModel->find($dni_admin);
             if (!$user) {
-                return $this->response->setStatusCode(401)->setJSON(['error' => 'Usuario no encontrado', 'forceLogout' => true]);
+                return $this->response->setStatusCode(401)->setJSON(['error' => 'Usuario del token no encontrado', 'forceLogout' => true]);
             }
-            if ($user['estado'] !== 'activo') {
-                return $this->response->setStatusCode(401)->setJSON([
-                    'error' => 'Tu cuenta ha sido desactivada',
-                    'forceLogout' => true
-                ]);
+
+            // CAMBIO: Verificamos el estado con '1'
+            if ($user['estado'] !== '1') {
+                return $this->response->setStatusCode(401)->setJSON(['error' => 'Tu cuenta ha sido desactivada', 'forceLogout' => true]);
             }
-            if ($decoded->categoria !== $user['categoria'] || $decoded->estado !== $user['estado']) {
-                $newPayload = [
-                    'iat' => time(),
-                    'exp' => time() + 3600,
-                    'dni_admin' => $user['dni_admin'],
-                    'categoria' => $user['categoria'],
-                    'nombres' => $user['nombres'],
-                    'estado' => $user['estado']
-                ];
-                $newToken = JWT::encode($newPayload, $key, 'HS256');
-                $this->response->setCookie([
-                    'name' => 'auth_token',
-                    'value' => $newToken,
-                    'expire' => time() + 3600,
-                    'path' => '/',
-                    'secure' => false, // Cambia a true si usas HTTPS
-                    'httponly' => true,
-                    'samesite' => 'Strict'
-                ]);
-                return $this->response->setJSON([
-                    'roleChanged' => true,
-                    'user' => [
-                        'dni_admin' => $user['dni_admin'],
-                        'nombres' => $user['nombres'],
-                        'categoria' => $user['categoria'],
-                        'estado' => $user['estado']
-                    ]
-                ]);
+
+            // Si el rol en la base de datos es diferente al del token, forzamos la actualización del token
+            if ($decoded->rol !== $user['rol']) {
+                // Aquí podrías refrescar el token si quisieras, o simplemente devolver los datos actualizados.
+                // Por ahora, solo devolvemos la información más reciente de la BD.
             }
+            
             return $this->response->setJSON([
-                'roleChanged' => false,
-                'user' => $user
+                'success' => true,
+                'user' => [
+                    'dni'    => $user['dni'],
+                    'nombre' => $user['nombre'],
+                    'rol'    => $user['rol'],
+                ]
             ]);
+
         } catch (\Exception $e) {
-            return $this->response->setStatusCode(401)->setJSON([
-                'error' => 'Token inválido o expirado',
-                'forceLogout' => true
-            ]);
+            // Si el token es inválido o expiró, forzamos el cierre de sesión en el frontend
+            return $this->response->setStatusCode(401)->setJSON(['error' => 'Token inválido o expirado', 'forceLogout' => true]);
         }
     }
+
     public function logout()
     {
+        // Elimina la cookie estableciendo una fecha de expiración en el pasado
         $this->response->setCookie([
-            'name' => 'auth_token',
-            'value' => '',
+            'name'   => 'auth_token',
+            'value'  => '',
             'expire' => time() - 3600,
-            'path' => '/',
-            'secure' => false, // Cambia a true si usas HTTPS
-            'httponly' => true,
-            'samesite' => 'Strict'
+            'path'   => '/',
         ]);
-        return $this->response->setJSON(['success' => true]);
+        return $this->response->setJSON(['success' => true, 'message' => 'Sesión cerrada correctamente.']);
     }
 }

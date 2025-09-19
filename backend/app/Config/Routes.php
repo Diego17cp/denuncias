@@ -130,11 +130,7 @@ $routes->group('/', ['filter' => 'cors'], function ($routes) {
     });
 
     $routes->group('corrupcion', ['namespace' => 'App\Controllers\denuncias_corrupcion'], function ($routes) {
-        $routes->get('api/tracking/(:alphanum)', 'Denuncias\Client\FormularioController::query/$1');
-        $routes->group('form', function ($routes) {
-            $routes->get('motivos', 'Denuncias\Client\FormularioController::index');
-            $routes->post('create', 'Denuncias\Client\FormularioController::create');
-            $routes->get('check-connection', 'Denuncias\Client\FormularioController::checkConnection'); // New route
+            $routes->get('api/tracking/(:alphanum)', 'Denuncias\Client\FormularioController::query/$1');
             $routes->post('login', 'Denuncias\Admin\VerificarController::login');
             $routes->post('logout', 'Denuncias\Admin\VerificarController::logout');
             $routes->get('admin-info', 'Denuncias\Admin\VerificarController::getAdminInfo');
@@ -164,7 +160,7 @@ $routes->group('/', ['filter' => 'cors'], function ($routes) {
                     $routes->get('history', 'Denuncias\Admin\GestionSuperAdmin::historyAdmin');
                 });
             });
-        });
+      
     });
 });
 $routes->options('(:any)', 'CorsController::options');
