@@ -38,7 +38,7 @@ class VerificarController extends BaseController
         }
 
         if (password_verify($password, $user['password'])) {
-            $key = 'your-secret-key'; // Es muy recomendable mover esta clave a un archivo de configuración (.env)
+            $key = 'your-secret-key'; 
             $payload = [
                 'iat' => time(),
                 'exp' => time() + 3600, // 1 hora de expiración
@@ -47,13 +47,13 @@ class VerificarController extends BaseController
             ];
             $token = JWT::encode($payload, $key, 'HS256');
 
-            // Enviar el token como una cookie HttpOnly para mayor seguridad
+            
             $this->response->setCookie([
                 'name'     => 'auth_token',
                 'value'    => $token,
                 'expire'   => time() + 3600,
                 'path'     => '/',
-                'secure'   => false, // Cambiar a true en producción con HTTPS
+                'secure'   => false, 
                 'httponly' => true,
                 'samesite' => 'Strict'
             ]);
@@ -63,8 +63,9 @@ class VerificarController extends BaseController
                 'message' => 'Inicio de sesión exitoso.',
                 'user' => [
                     'dni'    => $user['dni'],
-                    'nombre' => $user['nombre'], // CAMBIO: Usamos 'nombre'
-                    'rol'    => $user['rol'],    // CAMBIO: Usamos 'rol'
+                    'nombre' => $user['nombre'],
+                    'rol'    => $user['rol'],
+                    'estado' => $user['estado'] 
                 ],
             ]);
         }
@@ -107,6 +108,7 @@ class VerificarController extends BaseController
                     'dni'    => $user['dni'],
                     'nombre' => $user['nombre'],
                     'rol'    => $user['rol'],
+                    'estado' => $user['estado'] // AÑADIDO: Se incluye el estado del usuario.
                 ]
             ]);
 
@@ -128,3 +130,4 @@ class VerificarController extends BaseController
         return $this->response->setJSON(['success' => true, 'message' => 'Sesión cerrada correctamente.']);
     }
 }
+
