@@ -19,7 +19,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
     useEffect(() => {
         if (!loading && isAuthenticated && user) {
-            if (user.estado !== 'activo') {
+            if (user.estado !== '1') {
                 toast.error('Tu cuenta está inactiva. Por favor contacta al administrador.');
                 navigate('/admin/login', { replace: true });
             }

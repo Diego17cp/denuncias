@@ -16,7 +16,7 @@ interface User {
 	dni_admin: string;
 	categoria: string;
 	nombres: string;
-	estado: "activo" | "inactivo";
+	estado: "activo" | "inactivo" | "1" | "0";
 }
 
 export const AuthContext = createContext<AuthContextProps | null>(null);
