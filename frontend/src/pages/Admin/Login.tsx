@@ -78,7 +78,7 @@ export const Login = () => {
 							value={password}
 							onChange={handlePassword}
 							minLength={8}
-							disabled={isLoading}
+							// disabled={isLoading}
 							required
 						/>
 						<label className="absolute top-[45%] left-[1em] px-1.5 py-0 pointer-events-none bg-transparent text-(--gray-light) text-base transform -translate-y-1/2 transition-all duration-300 ease-in-out">
