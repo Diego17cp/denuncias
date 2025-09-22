@@ -77,6 +77,6 @@ export interface Administrador {
     dni_admin: string;
     nombres: string;
     categoria: 'admin' | 'super_admin';
-    estado: 'activo' | 'inactivo';
+    estado: 'activo' | 'inactivo' | '1' | '0';
 }
 export type Action = "password" | "state" | "role";
