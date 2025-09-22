@@ -49,7 +49,7 @@ class VerificarController extends BaseController
 
             
             $this->response->setCookie([
-                'name'     => 'auth_token',
+                'name'     => 'access_token',
                 'value'    => $token,
                 'expire'   => time() + 3600,
                 'path'     => '/',
@@ -75,7 +75,7 @@ class VerificarController extends BaseController
 
     public function getAdminInfo()
     {
-        $token = $this->request->getCookie('auth_token');
+        $token = $this->request->getCookie('access_token');
         if (!$token) {
             return $this->response->setStatusCode(401)->setJSON(['error' => 'No autorizado', 'forceLogout' => true]);
         }
@@ -122,7 +122,7 @@ class VerificarController extends BaseController
     {
         // Elimina la cookie estableciendo una fecha de expiración en el pasado
         $this->response->setCookie([
-            'name'   => 'auth_token',
+            'name'   => 'access_token',
             'value'  => '',
             'expire' => time() - 3600,
             'path'   => '/',
