@@ -41,7 +41,15 @@ class GestionSuperAdmin extends BaseController
         if (!$result) {
             return $this->response->setJSON(['error' => 'No se encontraron administradores'], 404);
         }
-        return $this->response->setJSON($result);
+        $data = array_map(function ($admin) {
+            return [
+                'dni_admin' => $admin['dni'],
+                'nombres' => $admin['nombre'],
+                'categoria' => $admin['rol'],
+                'estado' => $admin['estado']
+            ];
+        }, $result);
+        return $this->response->setJSON($data);
     }
     public function createAdministrador()
     {
