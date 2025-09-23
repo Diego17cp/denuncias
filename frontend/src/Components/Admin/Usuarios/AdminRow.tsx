@@ -44,7 +44,7 @@ export const AdminRow = ({
 						admin.estado
 					)}`}
 				>
-					{admin.estado === "1" ? "activo" : admin.estado === "0" ? "inactivo" : admin.estado}
+					{admin.estado}
 				</span>
 			</td>
 			<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -94,7 +94,7 @@ export const AdminRow = ({
 									scale-95 group-hover:scale-100
 									transition-all duration-200 ease-out"
 							>
-								{admin.estado === "1"
+								{admin.estado === "activo"
 									? "Desactivar"
 									: "Activar"}
 								<div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-(--primary-color)"></div>

@@ -178,7 +178,7 @@ export const useEditAdmin = (
 		try {
 			if (admin) {
 				const newStatus =
-					admin.estado === "1" ? "0" : "1";
+					admin.estado === "activo" ? "inactivo" : "activo";
 				await updateAdminStatus(
 					admin.dni_admin,
 					newStatus,

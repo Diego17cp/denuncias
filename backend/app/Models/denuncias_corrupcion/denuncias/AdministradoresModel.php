@@ -34,8 +34,8 @@ class AdministradoresModel extends Model
         'dni'      => 'required|numeric|min_length[8]|max_length[20]',
         'nombre'   => 'permit_empty|string|max_length[100]',
         'password' => 'required|string|min_length[8]|max_length[255]',
-        'rol'      => 'required|string|max_length[50]',
-        'estado'   => 'required|in_list[1,0]',
+        'rol'      => 'permit_empty|string|max_length[50]',
+        'estado'   => 'permit_empty|in_list[1,0]',
         'area'     => 'permit_empty|string|max_length[100]'
     ];
     protected $validationMessages = [
@@ -55,11 +55,11 @@ class AdministradoresModel extends Model
             'max_length' => 'La contraseña no puede exceder {param} caracteres.'
         ],
         'rol' => [
-            'required'   => 'El rol es obligatorio.',
+            //'required'   => 'El rol es obligatorio.',
             'max_length' => 'El rol no puede exceder {param} caracteres.'
         ],
         'estado' => [
-            'required' => 'El estado es obligatorio.',
+            //'required' => 'El estado es obligatorio.',
             'in_list'  => 'El estado debe ser "1" o "0"'
         ],
         'area' => [
@@ -71,12 +71,30 @@ class AdministradoresModel extends Model
 
     // Callbacks
     protected $allowCallbacks = true;
-    protected $beforeInsert   = [];
+    protected $beforeInsert   = ['mapFields'];
     protected $afterInsert    = [];
-    protected $beforeUpdate   = [];
+    protected $beforeUpdate   = ['mapFields'];
     protected $afterUpdate    = [];
     protected $beforeFind     = [];
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+
+    protected function mapFields(array $data)
+    {
+        // Si viene 'nombres', lo pasamos a 'nombre'
+        if (isset($data['data']['nombres'])) {
+            $data['data']['nombre'] = $data['data']['nombres'];
+            unset($data['data']['nombres']);
+        }
+
+        // Si viene 'dni_admin', lo pasamos a 'dni'
+        if (isset($data['data']['dni_admin'])) {
+            $data['data']['dni'] = $data['data']['dni_admin'];
+            unset($data['data']['dni_admin']);
+        }
+
+        return $data;
+    }
 }

@@ -82,7 +82,7 @@ export const useAdministrador = () => {
 		}
 	};
 	const updateAdministrador = async (dni: string, accion: 'estado' | 'password' | 'categoria', datos: {
-        estado?: 'activo' | 'inactivo' | '1' | '0';
+        estado?: 'activo' | 'inactivo';
         password?: string;
         categoria?: 'admin' | 'super_admin';
         motivo?: string;
@@ -90,7 +90,7 @@ export const useAdministrador = () => {
         setLoading(true);
         setError(null);
         try {
-            const currentDniAdmin = user?.dni || '';
+            const currentDniAdmin = user?.dni_admin || '';
 			if (!currentDniAdmin) {
 				throw new Error("No se encontró el DNI del administrador actual");
 			}
@@ -129,7 +129,7 @@ export const useAdministrador = () => {
     const updateAdminPassword = async (dni:string, password:string, motivo: string = 'Cambio de contraseña') => {
         return updateAdministrador(dni, 'password', { password, motivo });
     }
-    const updateAdminStatus = async (dni:string, estado:'1' | '0', motivo: string = estado === '1' ? 'Reactivación de cuenta' : 'Desactivación de cuenta') => {
+    const updateAdminStatus = async (dni:string, estado:'activo' | 'inactivo', motivo: string = estado === 'activo' ? 'Reactivación de cuenta' : 'Desactivación de cuenta') => {
         return updateAdministrador(dni, 'estado', { estado, motivo });
     }
     const updateAdminRole = async (dni:string, categoria:'admin' | 'super_admin', motivo: string = `Cambio de rol a ${categoria}`) => {

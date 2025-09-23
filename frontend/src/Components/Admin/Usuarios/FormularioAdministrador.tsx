@@ -110,19 +110,19 @@ const FormularioAdministrador: React.FC<FormularioAdministradorProps> = ({
 				return (
 					<div
 						className={`p-4 ${
-							admin?.estado === "1"
+							admin?.estado === "activo"
 								? "bg-red-50"
 								: "bg-green-50"
 						} rounded-md`}
 					>
 						<h4
 							className={`text-sm font-medium ${
-								admin?.estado === "1"
+								admin?.estado === "activo"
 									? "text-red-800"
 									: "text-green-800"
 							} mb-3`}
 						>
-							{admin?.estado === "1"
+							{admin?.estado === "activo"
 								? "Desactivar"
 								: "Activar"}{" "}
 							administrador
@@ -139,12 +139,12 @@ const FormularioAdministrador: React.FC<FormularioAdministradorProps> = ({
 									updateField("motivo", e.target.value)
 								}
 								className={`w-full p-2 border rounded transition-all outline-none duration-300 ease-in-out focus:ring-2 ${
-									admin?.estado === "1"
+									admin?.estado === "activo"
 										? "border-red-300 focus:ring-red-500"
 										: "border-green-300 focus:ring-green-500"
 								}`}
 								placeholder={`Indique el motivo para ${
-									admin?.estado === "1"
+									admin?.estado === "activo"
 										? "desactivar"
 										: "activar"
 								} al administrador`}
@@ -166,7 +166,7 @@ const FormularioAdministrador: React.FC<FormularioAdministradorProps> = ({
 							<button
 								onClick={() => handleSubmit()}
 								className={`${
-									admin?.estado === "1"
+									admin?.estado === "activo"
 										? "bg-red-600 hover:bg-red-700"
 										: "bg-green-600 hover:bg-green-700"
 								} disabled:cursor-not-allowed disabled:bg-gray-500 text-white px-4 py-2 rounded transition-colors duration-300 ease-in-out cursor-pointer`}
@@ -174,7 +174,7 @@ const FormularioAdministrador: React.FC<FormularioAdministradorProps> = ({
 							>
 								{isLoading ? (
 									<Loader isBtn={true} />
-								) : admin?.estado === "1" ? (
+								) : admin?.estado === "activo" ? (
 									"Desactivar"
 								) : (
 									"Activar"
