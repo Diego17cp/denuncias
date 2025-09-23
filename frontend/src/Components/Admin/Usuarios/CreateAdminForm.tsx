@@ -84,8 +84,8 @@ export const CreateAdminForm: React.FC<CreateAdminFormProps> = ({
 								}
 								className="w-full pl-10 pr-3 py-2.5 border outline-none border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
 								placeholder="Nombres completos"
-								disabled={isLoading}
-                                readOnly
+								// disabled={isLoading}
+                                // readOnly
 								required
 							/>
 							{isLoading && (
