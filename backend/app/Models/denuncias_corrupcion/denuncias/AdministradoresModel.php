@@ -34,7 +34,7 @@ class AdministradoresModel extends Model
         'dni'      => 'required|numeric|min_length[8]|max_length[20]',
         'nombre'   => 'permit_empty|string|max_length[100]',
         'password' => 'required|string|min_length[8]|max_length[255]',
-        'rol'      => 'permit_empty|string|max_length[50]',
+        'rol'      => 'permit_empty|alpha_numeric_punct|string|max_length[50]',
         'estado'   => 'permit_empty|in_list[1,0]',
         'area'     => 'permit_empty|string|max_length[100]'
     ];
