@@ -129,15 +129,16 @@ use Firebase\JWT\Key;
             }
         }
 
-        public function logout()
-        {
-            // Elimina la cookie estableciendo una fecha de expiración en el pasado
-            $this->response->setCookie([
-                'name'   => 'access_token',
-                'value'  => '',
-                'expire' => time() - 3600,
-                'path'   => '/',
-            ]);
-            return $this->response->setJSON(['success' => true, 'message' => 'Sesión cerrada correctamente.']);
-        }
+    public function logout()
+    {
+        // Elimina la cookie estableciendo una fecha de expiración en el pasado
+        $this->response->setCookie([
+            'name'   => 'auth_token',
+            'value'  => '',
+            'expire' => time() - 3600,
+            'path'   => '/',
+        ]);
+        return $this->response->setJSON(['success' => true, 'message' => 'Sesión cerrada correctamente.']);
     }
+}
+
