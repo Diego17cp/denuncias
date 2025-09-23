@@ -12,6 +12,13 @@ class ConsultaApi extends ResourceController
     public function buscarDNI($dni)
     {
         $response = $this->consultarApi($this->apiUrlDNI, $dni);
+
+        if (!$response) {
+            return $this->fail('Error al conectar con el servicio externo', 500);
+        }
+
+        log_message('error', 'Respuesta RENIEC: ' . json_encode($response));
+
         if (isset($response['data'])) {
             $result = [
                 'success' => true,

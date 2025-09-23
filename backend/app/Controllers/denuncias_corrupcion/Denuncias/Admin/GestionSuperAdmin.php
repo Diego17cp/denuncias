@@ -318,24 +318,37 @@ class GestionSuperAdmin extends BaseController
 
     public function updateAdministrador()
     {
-        $data      = $this->request->getJSON(true);
-        $accion    = $data['accion'] ?? null;
-        $admin_id  = $data['administrador_id'] ?? null; // el que hace la acción
-        $afectado  = $data['afectado_id'] ?? null;      // el admin afectado
-        $motivo    = $data['motivo'] ?? null;
+        $data        = $this->request->getJSON(true);
+        $accion      = $data['accion'] ?? null;
+        $dniAdmin    = $data['dni_admin'] ?? null; // el que hace la acción (DNI)
+        $dniAfectado = $data['dni'] ?? null;       // el admin afectado (DNI)
+        $motivo      = $data['motivo'] ?? null;
 
-        if (!$accion || !$admin_id || !$afectado || !$motivo) {
+        if (!$accion || !$dniAdmin || !$dniAfectado || !$motivo) {
             return $this->response->setJSON([
                 'error' => 'Faltan parámetros obligatorios'
             ])->setStatusCode(400);
         }
 
-        $adminToUpdate = $this->administradoresModel->find($afectado);
-        if (!$adminToUpdate) {
+        // Buscar admin actor (el que hace la acción)
+        $adminActor = $this->administradoresModel->where('dni', $dniAdmin)->first();
+        if (!$adminActor) {
             return $this->response->setJSON([
-                'error' => 'Administrador no encontrado'
+                'error' => 'Administrador que realiza la acción no encontrado'
             ])->setStatusCode(404);
         }
+
+        // Buscar admin afectado
+        $adminToUpdate = $this->administradoresModel->where('dni', $dniAfectado)->first();
+        if (!$adminToUpdate) {
+            return $this->response->setJSON([
+                'error' => 'Administrador afectado no encontrado'
+            ])->setStatusCode(404);
+        }
+
+        // IDs reales para actualizar y registrar en historial
+        $admin_id = $adminActor['id'];
+        $afectado = $adminToUpdate['id'];
 
         $historialData = [
             'administrador_id' => $admin_id,
@@ -347,13 +360,9 @@ class GestionSuperAdmin extends BaseController
         switch ($accion) {
             case 'estado':
                 $estado = $data['estado'] ?? null;
-                if (!isset($estado) || !in_array($estado, ['1', '0'])) {
-                    return $this->response->setJSON([
-                        'error' => 'Falta el estado'
-                    ])->setStatusCode(400);
-                }
-
+                $estado = (string)$estado === "0" ? "0" : "1"; // normalización
                 $updateResult = $this->administradoresModel->update($afectado, ['estado' => $estado]);
+
                 if (!$updateResult) {
                     return $this->response->setJSON([
                         'error' => 'No se pudo actualizar el estado del administrador'
@@ -369,7 +378,8 @@ class GestionSuperAdmin extends BaseController
                 ])->setStatusCode(200);
 
             case 'rol':
-                $rol = $data['rol'] ?? null;
+                // también acepta 'categoria' para ser consistente
+                $rol = $data['rol'] ?? ($data['categoria'] ?? null);
                 if (!$rol) {
                     return $this->response->setJSON([
                         'error' => 'Falta el rol'
@@ -422,9 +432,12 @@ class GestionSuperAdmin extends BaseController
         }
     }
 
+
     public function searchAdmin()
     {
-        $dni = $this->request->getGet('dni');
+        // normalizamos por si llega 'dni_admin'
+        $dni = $this->request->getGet('dni') ?? $this->request->getGet('dni_admin');
+
         if (!$dni) {
             return $this->response->setJSON(['error' => 'DNI no proporcionado'])->setStatusCode(400);
         }
@@ -446,7 +459,7 @@ class GestionSuperAdmin extends BaseController
             ->findAll();
 
         if (!$history) {
-            return $this->response->setJSON(['error' => 'No se encontraron registros de historial'], 404);
+            return $this->response->setJSON(['error' => 'No se encontraron registros de historial'])->setStatusCode(404);
         }
 
         return $this->response->setJSON($history);
