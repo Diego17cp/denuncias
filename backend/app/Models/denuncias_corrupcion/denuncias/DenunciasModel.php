@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\denuncias_corrupcion\Denuncias;
+namespace App\Models\denuncias_corrupcion\denuncias;
 
 use CodeIgniter\Model;
 
@@ -87,25 +87,24 @@ class DenunciasModel extends Model
 
 
     public function getDashboardData()
-    {
-        return $this
-            ->select('
-                denuncias.tracking_code, 
-                denuncias.estado, 
-                denuncias.fecha_registro, 
-                COALESCE(denunciantes.nombres, "Anónimo") as denunciante_nombre, 
-                COALESCE(denunciantes.numero_documento, "00000000") as denunciante_dni, 
-                denunciados.nombre as denunciado_nombre, 
-                denunciados.numero_documento as denunciado_dni, 
-                motivos.nombre as motivo
-            ')
-            ->join('denunciantes', 'denuncias.denunciante_id = denunciantes.id', 'left')
-            ->join('denunciados', 'denuncias.denunciado_id = denunciados.id')
-            ->join('motivos', 'denuncias.motivo_id = motivos.id')
-            ->where('denuncias.dni_admin', null)
-            ->where('denuncias.estado', 'registrado')
-            ->findAll();
-    }
+{
+    return $this
+        ->select('
+            denuncia.id,
+            denuncia.tracking_code,
+            denuncia.estado,
+            denuncia.created_at as fecha_registro,
+            denuncia.fecha_incidente,
+            COALESCE(denunciante.nombre, "Anónimo") as denunciante_nombre,
+            COALESCE(denunciante.numero_documento, "00000000") as denunciante_dni,
+            denunciado.nombre as denunciado_nombre,
+            motivo.nombre as motivo
+        ')
+        ->join('denunciante', 'denuncia.denunciante_id = denunciante.id', 'left')
+        ->join('denunciado', 'denuncia.denunciado_id = denunciado.id', 'left')
+        ->join('motivo', 'denuncia.motivo_id = motivo.id', 'left')
+        ->findAll();
+}
 
     public function receiveDenuncia($trackingCode, $dniAdmin, $estado, $comentario, $seguimientoData)
     {
