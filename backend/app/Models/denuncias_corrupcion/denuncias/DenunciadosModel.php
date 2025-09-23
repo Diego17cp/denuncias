@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\denuncias_corrupcion\Denuncias;
+namespace App\Models\denuncias_corrupcion\denuncias;
 
 use CodeIgniter\Model;
 
