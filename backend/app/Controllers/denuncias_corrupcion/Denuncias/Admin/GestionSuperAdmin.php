@@ -51,198 +51,9 @@ class GestionSuperAdmin extends BaseController
         }, $result);
         return $this->response->setJSON($data);
     }
-    // public function createAdministrador()
-    // {
-    //     $data = $this->request->getJSON(true);
-
-    //     // Verificar si ya existe un administrador con ese DNI
-    //     $existingAdmin = $this->administradoresModel->find($data['dni_admin']);
-    //     if ($existingAdmin) {
-    //         return $this->response->setJSON([
-    //             'error' => 'Ya existe un administrador con ese DNI'
-    //         ])->setStatusCode(400);
-    //     }
-    //     $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-    //     try {
-    //         $success = $this->administradoresModel
-    //             ->insert($data);
-
-    //         if ($success) {
-    //             $newAdmin = $this->administradoresModel->find($data['dni_admin']);
-    //             return $this->response->setJSON($newAdmin)->setStatusCode(201);
-    //         } else {
-    //             return $this->response->setJSON([
-    //                 'error' => 'Error al crear el administrador'
-    //             ])->setStatusCode(500);
-    //         }
-    //     } catch (\Exception $e) {
-    //         log_message('error', 'Error al crear administrador: ' . $e->getMessage());
-    //         return $this->response->setJSON([
-    //             'error' => 'Error al crear el administrador'
-    //         ])->setStatusCode(500);
-    //     }
-    // }
-    // public function updateAdministrador()
-    // {
-    //     $data = $this->request->getJSON(true);
-    //     $accion = $data['accion'] ?? null;
-    //     $dni_admin = $data['dni_admin'] ?? null;
-    //     $dni = $data['dni'] ?? null;
-    //     $motivo = $data['motivo'] ?? null;
-
-    //     if (!$accion || !$dni_admin || !$dni || !$motivo) {
-    //         return $this->response->setJSON([
-    //             'error' => 'Faltan parámetros obligatorios'
-    //         ])->setStatusCode(400);
-    //     }
-    //     $adminToUpdate = $this->administradoresModel->find($dni);
-    //     if (!$adminToUpdate) {
-    //         return $this->response->setJSON([
-    //             'error' => 'Administrador no encontrado'
-    //         ])->setStatusCode(404);
-    //     }
-
-    //     $historialData = [
-    //         'id' => $this->generateId('historialAdmin'),
-    //         'realizado_por' => $dni_admin,
-    //         'dni_admin' => $dni,
-    //         'fecha_accion' => date('Y-m-d H:i:s', strtotime('-5 hours')),
-    //         'accion' => $accion,
-    //         'motivo' => $motivo
-    //     ];
-
-    //     switch ($accion) {
-    //         case 'estado':
-    //             $estado = $data['estado'] ?? null;
-    //             if (!$estado || !in_array($estado, ['activo', 'inactivo'])) {
-    //                 return $this->response->setJSON([
-    //                     'error' => 'Falta el estado'
-    //                 ])->setStatusCode(400);
-    //             }
-    //             $updateResult = $this->administradoresModel
-    //                 ->update($dni, ['estado' => $estado]);
-    //             if (!$updateResult) {
-    //                 return $this->response->setJSON([
-    //                     'error' => 'No se pudo actualizar el estado del administrador'
-    //                 ])->setStatusCode(500);
-    //             }
-
-    //             $this->historialAdminModel
-    //                 ->insert($historialData);
-    //             return $this->response->setJSON([
-    //                 'message' => 'Estado actualizado correctamente',
-    //                 'estado' => $estado,
-    //                 'admin' => $this->administradoresModel->find($dni)
-    //             ])->setStatusCode(200);
-    //             break;
-    //         case 'categoria':
-    //             $categoria = $data['categoria'] ?? null;
-    //             if (!$categoria || !in_array($categoria, ['admin', 'super_admin'])) {
-    //                 return $this->response->setJSON([
-    //                     'error' => 'Falta la categoría'
-    //                 ])->setStatusCode(400);
-    //             }
-    //             $updateResult = $this->administradoresModel
-    //                 ->update($dni, ['categoria' => $categoria]);
-    //             if (!$updateResult) {
-    //                 return $this->response->setJSON([
-    //                     'error' => 'No se pudo actualizar la categoría del administrador'
-    //                 ])->setStatusCode(500);
-    //             }
-
-    //             $this->historialAdminModel
-    //                 ->insert($historialData);
-    //             return $this->response->setJSON([
-    //                 'message' => 'Categoría actualizada correctamente',
-    //                 'categoria' => $categoria,
-    //                 'admin' => $this->administradoresModel->find($dni)
-    //             ])->setStatusCode(200);
-    //             break;
-
-    //         case 'password':
-    //             $password = $data['password'] ?? null;
-    //             if (!$password) {
-    //                 return $this->response->setJSON([
-    //                     'error' => 'Falta la contraseña'
-    //                 ])->setStatusCode(400);
-    //             }
-    //             $updateResult = $this->administradoresModel
-    //                 ->update($dni, ['password' => password_hash($password, PASSWORD_DEFAULT)]);
-    //             if (!$updateResult) {
-    //                 return $this->response->setJSON([
-    //                     'error' => 'No se pudo actualizar la contraseña del administrador'
-    //                 ])->setStatusCode(500);
-    //             }
-
-    //             $this->historialAdminModel
-    //                 ->insert($historialData);
-    //             return $this->response->setJSON([
-    //                 'message' => 'Contraseña actualizada correctamente',
-    //                 'admin' => $this->administradoresModel->find($dni)
-    //             ])->setStatusCode(200);
-    //             break;
-    //         default:
-    //             return $this->response->setJSON([
-    //                 'error' => 'Acción no válida'
-    //             ])->setStatusCode(400);
-    //     }
-    // }
-    // public function searchAdmin()
-    // {
-    //     $dni = $this->request->getGet('dni_admin');
-    //     if (!$dni) {
-    //         return $this->response->setJSON(['error' => 'DNI no proporcionado'])->setStatusCode(400);
-    //     }
-    //     $admin = $this->administradoresModel->find($dni);
-    //     if (!$admin) {
-    //         return $this->response->setJSON(['error' => 'Administrador no encontrado'])->setStatusCode(404);
-    //     }
-    //     return $this->response->setJSON($admin);
-    // }
-    // public function historyAdmin()
-    // {
-    //     $history = $this->historialAdminModel
-    //         ->select('historial_admin.*, administradores.nombres AS admin_nombre, administradores.categoria AS admin_categoria')
-    //         ->join('administradores', 'historial_admin.dni_admin = administradores.dni_admin', 'left')
-    //         ->findAll();
-    //     if (!$history) {
-    //         return $this->response->setJSON(['error' => 'No se encontraron registros de historial'], 404);
-    //     }
-    //     return $this->response->setJSON($history);
-    // }
-
+    
     public function createAdministrador()
     {
-
-        // $data = $this->request->getJSON(true);
-
-        // // Verificar si ya existe un administrador con ese DNI
-        // $existingAdmin = $this->administradoresModel->where('dni', $data['dni'])->first();
-        // if ($existingAdmin) {
-        //     return $this->response->setJSON([
-        //         'error' => 'Ya existe un administrador con ese DNI'
-        //     ])->setStatusCode(400);
-        // }
-
-        // $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-
-        // try {
-        //     $success = $this->administradoresModel->insert($data);
-
-        //     if ($success) {
-        //         $newAdmin = $this->administradoresModel->find($this->administradoresModel->getInsertID());
-        //         return $this->response->setJSON($newAdmin)->setStatusCode(201);
-        //     } else {
-        //         return $this->response->setJSON([
-        //             'error' => 'Error al crear el administrador'
-        //         ])->setStatusCode(500);
-        //     }
-        // } catch (\Exception $e) {
-        //     log_message('error', 'Error al crear administrador: ' . $e->getMessage());
-        //     return $this->response->setJSON([
-        //         'error' => 'Error al crear el administrador'
-        //     ])->setStatusCode(500);
-        // }
 
         $data = $this->request->getJSON(true);
 
@@ -320,8 +131,8 @@ class GestionSuperAdmin extends BaseController
     {
         $data        = $this->request->getJSON(true);
         $accion      = $data['accion'] ?? null;
-        $dniAdmin    = $data['dni_admin'] ?? null; // el que hace la acción (DNI)
-        $dniAfectado = $data['dni'] ?? null;       // el admin afectado (DNI)
+        $dniAdmin    = $data['dni_admin'] ?? null; 
+        $dniAfectado = $data['dni'] ?? null;       
         $motivo      = $data['motivo'] ?? null;
 
         if (!$accion || !$dniAdmin || !$dniAfectado || !$motivo) {
@@ -377,19 +188,23 @@ class GestionSuperAdmin extends BaseController
                     'admin'   => $this->administradoresModel->find($afectado)
                 ])->setStatusCode(200);
 
-            case 'rol':
-                // también acepta 'categoria' para ser consistente
+            case 'categoria':
+                
                 $rol = $data['rol'] ?? ($data['categoria'] ?? null);
-                if (!$rol) {
+
+                if (empty($rol)) {
                     return $this->response->setJSON([
                         'error' => 'Falta el rol'
                     ])->setStatusCode(400);
                 }
 
-                $updateResult = $this->administradoresModel->update($afectado, ['rol' => $rol]);
-                if (!$updateResult) {
+                // log para depuración
+                log_message('debug', 'Actualizando rol => ' . $rol);
+
+                if (!$this->administradoresModel->update($afectado, ['rol' => (string) $rol])) {
                     return $this->response->setJSON([
-                        'error' => 'No se pudo actualizar el rol del administrador'
+                        'error' => 'No se pudo actualizar el rol del administrador',
+                        'details' => $this->administradoresModel->errors()
                     ])->setStatusCode(500);
                 }
 
@@ -432,10 +247,9 @@ class GestionSuperAdmin extends BaseController
         }
     }
 
-
     public function searchAdmin()
     {
-        // normalizamos por si llega 'dni_admin'
+        // Normalizamos por si llega 'dni_admin'
         $dni = $this->request->getGet('dni') ?? $this->request->getGet('dni_admin');
 
         if (!$dni) {
@@ -447,21 +261,50 @@ class GestionSuperAdmin extends BaseController
             return $this->response->setJSON(['error' => 'Administrador no encontrado'])->setStatusCode(404);
         }
 
-        return $this->response->setJSON($admin);
+        // Mapear al formato esperado por el frontend
+        $data = [
+            'dni_admin' => $admin['dni'],
+            'nombres'   => $admin['nombre'],
+            'categoria' => $admin['rol'],
+            'estado'    => $admin['estado'] == '1' ? 'activo' : 'inactivo'
+        ];
+
+        return $this->response->setJSON($data);
     }
 
     public function historyAdmin()
     {
         $history = $this->historialAdminModel
-            ->select('historial_admin.*, a.nombre AS admin_nombre, b.nombre AS afectado_nombre')
+            ->select('historial_admin.*, 
+                    a.nombre AS admin_nombre, 
+                    a.rol AS admin_categoria,
+                    a.nombre AS realizado_por,
+                    b.nombre AS afectado_nombre,
+                    b.dni AS afectado_dni,
+                    historial_admin.created_at AS fecha_accion')
             ->join('administrador a', 'historial_admin.administrador_id = a.id', 'left')
             ->join('administrador b', 'historial_admin.afectado_id = b.id', 'left')
             ->findAll();
 
         if (!$history) {
-            return $this->response->setJSON(['error' => 'No se encontraron registros de historial'])->setStatusCode(404);
+            return $this->response
+                ->setJSON(['error' => 'No se encontraron registros de historial'])
+                ->setStatusCode(404);
         }
 
-        return $this->response->setJSON($history);
+        $data = array_map(function ($item) {
+            return [
+                'id'              => (string) $item['id'],
+                'realizado_por'   => $item['realizado_por'],     // nombre del actor
+                'dni_admin'       => $item['afectado_dni'],      // DNI real del afectado
+                'accion'          => $item['accion'],
+                'motivo'          => $item['motivo'],
+                'fecha_accion'    => $item['fecha_accion'],
+                'admin_nombre'    => $item['afectado_nombre'],   // nombre del afectado
+                'admin_categoria' => $item['admin_categoria'],   // categoría del actor
+            ];
+        }, $history);
+
+        return $this->response->setJSON($data);
     }
 }
