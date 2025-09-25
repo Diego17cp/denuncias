@@ -14,13 +14,13 @@ class GestionAdminController extends ResourceController
     private $denunciantesModel;
     private $denunciasModel;
     private $seguimientoDenunciasModel;
-    private $email;
+    private $mailService;
     public function __construct()
     {
         $this->denunciantesModel = new DenunciantesModel();
         $this->denunciasModel = new DenunciasModel();
         $this->seguimientoDenunciasModel = new SeguimientoDenunciasModel();
-        $this->email = Services::email();
+        $this->mailService = new \App\Services\MailService();
     }
     public function generateId($table)
     {
@@ -40,32 +40,6 @@ class GestionAdminController extends ResourceController
             $uuid = $prefix . substr(bin2hex(random_bytes(6)), 0, 6);
         } while ($model->where('id', $uuid)->first());
         return $uuid;
-    }
-    public function correo($correo, $code, $estado, $comentario)
-    {
-        $this->email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
-        $this->email->setTo($correo);
-        $this->email->setSubject('Código de Seguimiento de Denuncia');
-        $this->email->setMessage("
-            <html>
-            <head>
-            <title>Estado de Denuncia</title>
-            </head>
-            <body style='font-family: Asap, sans-serif;'>
-            <p>Estimado usuario,</p>
-            <p>Le informamos sobre el estado actual de su denuncia:</p>
-            <p><strong>Código de Seguimiento:</strong> $code</p>
-            <p><strong>Estado:</strong> $estado</p>
-            <p><strong>Comentario:</strong> $comentario</p>
-            <p>Para realizar el seguimiento de su denuncia, puede ingresar al siguiente enlace:</p>
-            <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Seguimiento</a></p>
-            <p>Atentamente,</p>
-            <p><strong>Municipalidad Distrital de José Leonardo Ortiz</strong></p>
-            </body>
-            </html>
-        ");
-
-        return $this->email->send();
     }
     //Funciones para la gestion de denuncias
     public function dashboard()
@@ -144,8 +118,8 @@ class GestionAdminController extends ResourceController
             ->where('id', $denuncia['denunciante_id'])
             ->first();
 
-        if ($correo) {
-            $this->correo($correo['email'], $code, $estado, $comentario);
+        if ($correo && !empty($correo['email'])) {
+            $this->mailService->seguimientogMail($correo['email'], $code, $estado, $comentario);
         }
 
         return $this->response->setJSON([
@@ -264,8 +238,8 @@ class GestionAdminController extends ResourceController
             ->select('email')
             ->where('id', $id_denuncias['denunciante_id'])
             ->first();
-        if ($correo) {
-            $this->correo($correo['email'], $code, $estado, $comentario);
+        if ($correo && !empty($correo['email'])) {
+            $this->mailService->seguimientogMail($correo['email'], $code, $estado, $comentario);
         }
 
         if ($this->seguimientoDenunciasModel->insert([
@@ -314,5 +288,4 @@ class GestionAdminController extends ResourceController
             'data' => $denuncias
         ]);
     }
-
 }

@@ -19,7 +19,7 @@ class FormularioController extends BaseController
     private $denunciantesModel;
     private $motivosModel;
     private $seguimientoDenunciasModel;
-    private $email;
+    private $mailService;
     function __construct()
     {
         $this->adjuntosModel = new AdjuntosModel();
@@ -28,7 +28,7 @@ class FormularioController extends BaseController
         $this->denunciantesModel = new DenunciantesModel();
         $this->motivosModel = new MotivosModel();
         $this->seguimientoDenunciasModel = new SeguimientoDenunciasModel();
-        $this->email = Services::email();
+        $this->mailService = new \App\Services\MailService();
     }
     function index()
     {
@@ -60,38 +60,6 @@ class FormularioController extends BaseController
             $trackingCode = 'TD' . strtoupper(bin2hex(random_bytes(9)));
         } while ($this->denunciasModel->where('tracking_code', $trackingCode)->first());
         return $trackingCode;
-    }
-    public function correo($correo, $code)
-    {
-        // Cargar la librería de correo
-        $this->email->setFrom('munijloenlinea@gmail.com', 'Municipalidad Distrital de José Leonardo Ortiz');
-        $this->email->setTo($correo);
-        $this->email->setSubject('Código de Seguimiento de Denuncia');
-        $this->email->setMessage("
-            <html>
-            <head>
-                <title>Código de Seguimiento de Denuncia</title>
-            </head>
-            <body style='font-family: Asap, sans-serif;'>
-                <p>Estimado usuario,</p>
-                <p>Su denuncia ha sido registrada exitosamente. A continuación, le proporcionamos su código de seguimiento:</p>
-                <p 
-                    style=
-                    'font-size: 18px; 
-                    font-weight: bold; 
-                    color: #2E8ACB; 
-                    padding:15px; 
-                    background-color: #CDDFEC';>$code</p>
-                <p>Por favor, conserve este código para futuras consultas.</p>
-                <p>Para realizar el seguimiento de su denuncia, puede ingresar al siguiente enlace:</p>
-                <p><a href='http://localhost:5173/tracking-denuncia?codigo=$code'>Seguimiento</a></p>
-                <p>Atentamente,</p>
-                <p><strong>Municipalidad Distrital de José Leonardo Ortiz</strong></p>
-            </body>
-            </html>
-        ");
-
-        return $this->email->send();
     }
     function create()
     {
@@ -223,7 +191,7 @@ class FormularioController extends BaseController
 
         // Enviar correo si aplica (no parte de la transacción)
         if (!$denuncia['es_anonimo'] ?? false) {
-            $this->correo($denunciante['email'] ?? null, $code);
+            $this->mailService->sendTrackingMail($denunciante['email'] ?? null, $code);
         }
 
         return $this->response->setJSON([
