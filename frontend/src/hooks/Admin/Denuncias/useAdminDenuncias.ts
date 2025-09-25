@@ -61,7 +61,7 @@ export const useAdminDenuncias = (itemsPerPage: number = 10) => {
 	}, [fetchDenuncias]);
 
 	const recibirDenuncia = async (dni: string, tracking_code: string) => {
-		const adminDni = dni || user?.dni_admin|| "";
+		const adminDni = dni || user?.dni || "";
 		if (!adminDni) {
 			toast.error("Error de autenticación", {
 				description: "No se pudo identificar al administrador actual"
