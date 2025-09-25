@@ -234,7 +234,7 @@ export const useAdminDenunciasRecibidas = (itemsPerPage: number = 10) => {
 				const token = localStorage.getItem("token");
 			
 				const response = await fetch(
-					`http://localhost/denuncias/backend/public/download?tracking_code=${tracking_code}`,
+					`http://localhost/denuncias/backend/public/corrupcion/download?tracking_code=${tracking_code}`,
 					{
 						method: "GET",
 						headers: {
