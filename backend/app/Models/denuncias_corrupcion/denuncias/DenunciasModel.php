@@ -85,26 +85,31 @@ class DenunciasModel extends Model
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
-
+    private function getAdminIdByDni($dniAdmin)
+    {
+        $adminModel = new \App\Models\denuncias_corrupcion\denuncias\AdministradoresModel();
+        $admin = $adminModel->where('dni', $dniAdmin)->first();
+        return $admin ? $admin['id'] : null;
+    }
     public function getDashboardData()
-{
-    return $this
-        ->select('
-            denuncia.id,
-            denuncia.tracking_code,
-            denuncia.estado,
-            denuncia.created_at as fecha_registro,
-            denuncia.fecha_incidente,
-            COALESCE(denunciante.nombre, "Anónimo") as denunciante_nombre,
-            COALESCE(denunciante.numero_documento, "00000000") as denunciante_dni,
-            denunciado.nombre as denunciado_nombre,
-            motivo.nombre as motivo
-        ')
-        ->join('denunciante', 'denuncia.denunciante_id = denunciante.id', 'left')
-        ->join('denunciado', 'denuncia.denunciado_id = denunciado.id', 'left')
-        ->join('motivo', 'denuncia.motivo_id = motivo.id', 'left')
-        ->findAll();
-}
+    {
+        return $this
+            ->select('
+                denuncia.id,
+                denuncia.tracking_code,
+                denuncia.estado,
+                denuncia.created_at as fecha_registro,
+                denuncia.fecha_incidente,
+                COALESCE(denunciante.nombre, "Anónimo") as denunciante_nombre,
+                COALESCE(denunciante.documento, "00000000") as denunciante_dni,
+                denunciado.nombre as denunciado_nombre,
+                motivo.nombre as motivo
+            ')
+            ->join('denunciante', 'denuncia.denunciante_id = denunciante.id', 'left')
+            ->join('denunciado', 'denuncia.denunciado_id = denunciado.id', 'left')
+            ->join('motivo', 'denuncia.motivo_id = motivo.id', 'left')
+            ->findAll();
+    }
 
     public function receiveDenuncia($trackingCode, $dniAdmin, $estado, $comentario, $seguimientoData)
     {
@@ -126,7 +131,12 @@ class DenunciasModel extends Model
 
         // Use SeguimientoDenunciasModel to insert seguimiento
         $seguimientoModel = new \App\Models\Denuncias\SeguimientoDenunciasModel();
-        $seguimientoData['denuncia_id'] = $denuncia['id'];
+        $seguimientoData = [
+            'denuncia_id'     => $denuncia['id'],
+            'comentario'      => $comentario,
+            'administrador_id'=> $this->getAdminIdByDni($dniAdmin), // convertir DNI a ID
+            'estado'          => $estado
+        ];
         $seguimientoModel->insertSeguimiento($seguimientoData);
 
         $this->db->transComplete();
@@ -134,58 +144,84 @@ class DenunciasModel extends Model
         return $this->db->transStatus() ? $denuncia : false;
     }
 
-    public function getReceivedAdminData($dniAdmin)
-    {
-        return $this
-            ->select('
-                denuncias.tracking_code, 
-                denuncias.estado, 
-                denuncias.fecha_registro, 
-                denuncias.fecha_incidente,
-                denuncias.descripcion,
-                denuncias.motivo_otro,
-                COALESCE(denunciantes.nombres, "Anónimo") as denunciante_nombre, 
-                COALESCE(denunciantes.numero_documento, "00000000") as denunciante_dni, 
-                denunciados.nombre as denunciado_nombre, 
-                denunciados.numero_documento as denunciado_dni, 
-                motivos.nombre as motivo,
-                seguimiento_denuncias.estado as seguimiento_estado,
-                seguimiento_denuncias.comentario as seguimiento_comentario
-            ')
-            ->join('denunciantes', 'denuncias.denunciante_id = denunciantes.id', 'left')
-            ->join('denunciados', 'denuncias.denunciado_id = denunciados.id')
-            ->join('motivos', 'denuncias.motivo_id = motivos.id')
-            ->join('seguimiento_denuncias', 'denuncias.id = seguimiento_denuncias.denuncia_id', 'left')
-            ->where('denuncias.dni_admin', $dniAdmin)
-            ->whereIn('denuncias.estado', ['en proceso', 'recibida'])
-            ->groupBy('denuncias.id')
-            ->findAll();
-    }
+    // public function getReceivedAdminData($dniAdmin)
+    // {
+    //     return $this
+    //         ->select('
+    //             denuncias.tracking_code, 
+    //             denuncias.estado, 
+    //             denuncias.fecha_registro, 
+    //             denuncias.fecha_incidente,
+    //             denuncias.descripcion,
+    //             denuncias.motivo_otro,
+    //             COALESCE(denunciantes.nombres, "Anónimo") as denunciante_nombre, 
+    //             COALESCE(denunciantes.numero_documento, "00000000") as denunciante_dni, 
+    //             denunciados.nombre as denunciado_nombre, 
+    //             denunciados.numero_documento as denunciado_dni, 
+    //             motivos.nombre as motivo,
+    //             seguimiento_denuncias.estado as seguimiento_estado,
+    //             seguimiento_denuncias.comentario as seguimiento_comentario
+    //         ')
+    //         ->join('denunciantes', 'denuncias.denunciante_id = denunciantes.id', 'left')
+    //         ->join('denunciados', 'denuncias.denunciado_id = denunciados.id')
+    //         ->join('motivos', 'denuncias.motivo_id = motivos.id')
+    //         ->join('seguimiento_denuncias', 'denuncias.id = seguimiento_denuncias.denuncia_id', 'left')
+    //         ->where('denuncias.dni_admin', $dniAdmin)
+    //         ->whereIn('denuncias.estado', ['en proceso', 'recibida'])
+    //         ->groupBy('denuncias.id')
+    //         ->findAll();
+    // }
+
+    public function getReceivedAdminData()
+{
+    return $this
+        ->select('
+            denuncia.tracking_code,
+            denuncia.estado,
+            denuncia.created_at as fecha_registro,
+            denuncia.fecha_incidente,
+            denuncia.descripcion,
+            denuncia.motivo_otro,
+            COALESCE(denunciante.nombre, "Anónimo") as denunciante_nombre,
+            COALESCE(denunciante.documento, "00000000") as denunciante_dni,
+            denunciado.nombre as denunciado_nombre,
+            denunciado.documento as denunciado_dni,
+            motivo.nombre as motivo,
+            seguimiento_denuncia.comentario as seguimiento_comentario
+        ')
+        ->join('denunciante', 'denuncia.denunciante_id = denunciante.id', 'left')
+        ->join('denunciado', 'denuncia.denunciado_id = denunciado.id', 'left')
+        ->join('motivo', 'denuncia.motivo_id = motivo.id', 'left')
+        ->join('seguimiento_denuncia', 'denuncia.id = seguimiento_denuncia.denuncia_id', 'left')
+        ->whereIn('denuncia.estado', ['en proceso', 'recibida'])
+        ->groupBy('denuncia.id')
+        ->findAll();
+}
 
     public function searchByDocumento($numeroDocumento)
     {
         return $this
             ->select('
-                denuncias.id,
-                denuncias.tracking_code,
-                denuncias.motivo_id,
-                denuncias.descripcion, 
-                denuncias.fecha_registro,
-                denuncias.estado,
-                denuncias.motivo_otro,
-                denunciados.nombre as denunciado_nombre,
-                denunciados.numero_documento as denunciado_dni,
-                COALESCE(denunciantes.nombres, "Anónimo") as denunciante_nombre,
-                COALESCE(denunciantes.numero_documento, "") as denunciante_dni,
+                denuncia.id,
+                denuncia.tracking_code,
+                denuncia.motivo_id,
+                denuncia.descripcion, 
+                denuncia.fecha_incidente,
+                denuncia.estado,
+                denuncia.motivo_otro,
+                denunciado.nombre as denunciado_nombre,
+                denunciado.documento as denunciado_dni,
+                COALESCE(denunciante.nombre, "Anónimo") as denunciante_nombre,
+                COALESCE(denunciante.documento, "") as denunciante_dni,
                 (
-                    SELECT comentario FROM seguimiento_denuncias 
-                    WHERE seguimiento_denuncias.denuncia_id = denuncias.id 
-                    ORDER BY fecha_actualizacion DESC LIMIT 1
+                    SELECT comentario FROM seguimiento_denuncia 
+                    WHERE seguimiento_denuncia.denuncia_id = denuncia.id 
+                    ORDER BY fecha_incidente DESC LIMIT 1
                 ) as seguimiento_comentario
             ')
-            ->join('denunciados', 'denuncias.denunciado_id = denunciados.id')
-            ->join('denunciantes', 'denuncias.denunciante_id = denunciantes.id', 'left')
-            ->where('denunciados.numero_documento', $numeroDocumento)
+            ->join('denunciado', 'denuncia.denunciado_id = denunciado.id')
+            ->join('denunciante', 'denuncia.denunciante_id = denunciante.id', 'left')
+            ->where('denunciado.documento', $numeroDocumento)
             ->findAll();
     }
 
