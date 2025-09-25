@@ -71,7 +71,7 @@ class SeguimientoDenunciasModel extends Model
     public function getSeguimientosByDenunciaId($denunciaId)
     {
         return $this->where('denuncia_id', $denunciaId)
-                    ->orderBy('fecha_actualizacion', 'DESC')
+                    ->orderBy('created_at', 'DESC')
                     ->findAll();
     }
 }
