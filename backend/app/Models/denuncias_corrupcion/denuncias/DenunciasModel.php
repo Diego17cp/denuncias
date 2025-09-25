@@ -108,6 +108,7 @@ class DenunciasModel extends Model
             ->join('denunciante', 'denuncia.denunciante_id = denunciante.id', 'left')
             ->join('denunciado', 'denuncia.denunciado_id = denunciado.id', 'left')
             ->join('motivo', 'denuncia.motivo_id = motivo.id', 'left')
+            ->where('denuncia.estado', 'registrado')
             ->findAll();
     }
 
