@@ -49,8 +49,10 @@ export interface Motivo {
 }
 
 interface Tracking {
+	id: string;
 	estado: string;
 	fecha_actualizacion: string;
+	created_at: string;
 	comentario: string;
 }
 

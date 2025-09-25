@@ -31,7 +31,7 @@ export const TimeLine = ({ trackingUtils }: TimeLineProps) => {
 						return (
 							// Contenedor
 							<div
-								key={tracking.fecha_actualizacion}
+								key={tracking.id}
 								className={`relative pl-16 animate-fadeIn`}
 								style={{ animationDelay: `${index * 150}ms` }}
 							>
@@ -79,7 +79,7 @@ export const TimeLine = ({ trackingUtils }: TimeLineProps) => {
 										<i className="fa-regular fa-calendar-check mr-2"></i>
 										<time>
 											{formatDate(
-												tracking.fecha_actualizacion
+												tracking.created_at || tracking.fecha_actualizacion
 											)}
 										</time>
 									</div>
