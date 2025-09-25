@@ -72,4 +72,15 @@ class DenunciadosModel extends Model
     {
         return $this->insert($data);
     }
+    public function getIdByDocument($documento, $tipoDocumento = null)
+    {
+        $builder = $this->where('documento', $documento);
+        
+        if ($tipoDocumento) {
+            $builder->where('tipo_documento', strtoupper($tipoDocumento));
+        }
+        
+        $result = $builder->first();
+        return $result ? $result['id'] : null;
+    }
 }
