@@ -248,10 +248,22 @@ class FormularioController extends BaseController
 
         // Fetch seguimientos by denuncia ID
         $seguimientos = $this->seguimientoDenunciasModel->getSeguimientosByDenunciaId($denuncia['id']);
+        
+        $data = [];
+
+        $registered = [
+            'id' => 'registrada_' . $denuncia['id'],
+            'estado' => 'registrada',
+            'comentario' => 'Tu denuncia ha sido registrada exitosamente en el sistema y está en proceso de revisión.',
+            'created_at' => $denuncia['created_at'],
+        ];
+
+        if (empty($seguimientos)) $data = [$registered];
+        else $data = array_merge($seguimientos, [$registered]);
 
         return $this->response->setJSON([
             'success' => true,
-            'data' => $seguimientos
+            'data' => $data
         ]);
     }
     public function checkConnection()

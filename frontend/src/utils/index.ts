@@ -348,6 +348,7 @@ export const formatDateComplete = (dateString: string) => {
 export const getStatusColor = (status: string) => {
 	switch (status) {
 		case "registrado":
+		case "registrada":
 			return "bg-yellow-100 text-yellow-800 border-yellow-200";
 		case "en proceso":
 			return "bg-blue-100 text-blue-800 border-blue-200";

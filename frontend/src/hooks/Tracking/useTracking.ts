@@ -41,6 +41,7 @@ export const useTracking = () => {
 	const getStatusIcon = (status: string) => {
 		switch (status.toLowerCase()) {
 			case "registrado":
+			case "registrada":
 				return "fa-file-circle-check";
 			case "recibida":
 				return "fa-inbox";
@@ -69,6 +70,7 @@ export const useTracking = () => {
 	const getGlowColorFromStatus = (status: string): string => {
 		switch (status) {
 			case "registrado":
+			case "registrada":
 				return "var(--registrado-bg)";
 			case 'recibida':
 				return "var(--recibida-bg)";
