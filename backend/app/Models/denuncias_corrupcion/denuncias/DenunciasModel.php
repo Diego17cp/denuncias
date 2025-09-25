@@ -85,7 +85,7 @@ class DenunciasModel extends Model
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
-    private function getAdminIdByDni($dniAdmin)
+    public function getAdminIdByDni($dniAdmin)
     {
         $adminModel = new \App\Models\denuncias_corrupcion\denuncias\AdministradoresModel();
         $admin = $adminModel->where('dni', $dniAdmin)->first();
