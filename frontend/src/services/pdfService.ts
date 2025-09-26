@@ -69,7 +69,7 @@ export const generarDenunciaPDF = (formData: FormData, motivos: Motivo[]) => {
 	const motivoSeleccionado = motivos.find((m) => m.id === formData.motivo_id);
 	const nombreMotivo = motivoSeleccionado
 		? motivoSeleccionado.nombre
-		: formData.motivo_id === "mo_otros"
+		: formData.motivo_id === "8"
 		? "Otros"
 		: "Desconocido";
 	const denunciaDetails = [
@@ -80,7 +80,7 @@ export const generarDenunciaPDF = (formData: FormData, motivos: Motivo[]) => {
 		],
 		[
 			"Motivo de la denuncia",
-			formData.motivo_id === "mo_otros"
+			formData.motivo_id === "8"
 				? `Otros: ${formData.motivo_otro}`
 				: nombreMotivo,
 		],

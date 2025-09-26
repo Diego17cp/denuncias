@@ -165,7 +165,7 @@ export const validatePage = (
 				toast.error("Debes seleccionar un motivo de denuncia");
 				return false;
 			}
-			if (formData.motivo_id === "mo_otros" && !formData.motivo_otro) {
+			if (formData.motivo_id === "8" && !formData.motivo_otro) {
 				toast.error("Debes especificar el motivo de la denuncia");
 				return false;
 			}
