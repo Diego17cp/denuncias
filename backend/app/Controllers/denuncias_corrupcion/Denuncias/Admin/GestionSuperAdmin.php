@@ -4,8 +4,8 @@ namespace App\Controllers\denuncias_corrupcion\Denuncias\Admin;
 
 use App\Controllers\BaseController;
 
-use App\Models\denuncias_corrupcion\Denuncias\AdministradoresModel;
-use App\Models\denuncias_corrupcion\Denuncias\HistorialAdminModel;
+use App\Models\denuncias_corrupcion\denuncias\AdministradoresModel;
+use App\Models\denuncias_corrupcion\denuncias\HistorialAdminModel;
 
 class GestionSuperAdmin extends BaseController
 {
