@@ -5,7 +5,7 @@ namespace App\Filters;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\Filters\FilterInterface;
-use App\Models\Denuncias\AdministradoresModel;
+use App\Models\denuncias_corrupcion\denuncias\AdministradoresModel;
 
 helper("cookie");
 helper("jwt");
