@@ -11,6 +11,7 @@ export interface Denuncias {
 	motivo: string;
 	descripcion: string;
 	fecha_registro: string;
+	fecha_incidente: string
 	estado: string;
 	motivo_otro: string;
 	denunciante_nombre: string
@@ -171,6 +172,7 @@ export const useSearchDenuncia = () => {
 							)?.nombre || "",
 						descripcion: denuncia.descripcion,
 						fecha_registro: denuncia.fecha_registro,
+						fecha_incidente: denuncia.fecha_incidente,
 						estado: denuncia.estado,
 						motivo_otro: denuncia.motivo_otro,
 						denunciante_nombre: denuncia.denunciante_nombre,
@@ -257,7 +259,7 @@ export const useSearchDenuncia = () => {
 		if (!denunciaData.length) return [];
 		return denunciaData.filter((denuncia) => {
 			if (fechaFilter) {
-				const fechaDenuncia = new Date(denuncia.fecha_registro)
+				const fechaDenuncia = new Date(denuncia.fecha_incidente)
 					.toISOString()
 					.split("T")[0];
 				if (fechaDenuncia !== fechaFilter) return false;

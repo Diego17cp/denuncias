@@ -50,18 +50,11 @@ export const DenunciaCard = ({
 						<span className="text-indigo-600">
 							<CalendarIcon />
 						</span>
-						{new Date(denuncia.fecha_registro).toLocaleDateString(
-							"es-ES",
-							{
-								year: "numeric",
-								month: "long",
-								day: "numeric",
-							}
-						)}
+						{denuncia.fecha_incidente}
 					</div>
 					<div className="mt-2">
 						<span className="inline-block bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded-md">
-							{denuncia.motivo_id === "mo_otros"
+							{denuncia.motivo_id === "8"
 								? denuncia.motivo_otro
 								: denuncia.motivo}
 						</span>
