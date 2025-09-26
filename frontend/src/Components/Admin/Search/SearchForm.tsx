@@ -50,7 +50,7 @@ export const SearchForm = ({
 						</option>
 						<option value="dni">DNI</option>
 						<option value="ruc">RUC</option>
-						<option value="carnet-extranjeria">
+						<option value="CE">
 							Carnet de Extranjería
 						</option>
 					</select>

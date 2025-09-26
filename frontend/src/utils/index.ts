@@ -223,7 +223,7 @@ export const validatePage = (
 				return false;
 			}
 			if (
-				formData.denunciado.tipo_documento === "carnet-extranjeria" &&
+				formData.denunciado.tipo_documento === "CE" &&
 				!formData.denunciado.nombre
 			) {
 				toast.error("Debes ingresar el nombre del denunciado");
