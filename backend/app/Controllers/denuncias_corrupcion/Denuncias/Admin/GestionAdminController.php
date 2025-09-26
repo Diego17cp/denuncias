@@ -47,47 +47,7 @@ class GestionAdminController extends ResourceController
         $denuncias = $this->denunciasModel->getDashboardData();
         return $this->response->setJSON($denuncias);
     }
-    // public function receiveAdmin()
-    // {
-    //     $data = $this->request->getGet();
-    //     $code = $data['tracking_code'];
-    //     $dni_admin = $data['dni_admin'];
-    //     $estado = 'recibida';
-    //     $comentario = 'La denuncia ha sido recibida por el administrador';
 
-    //     $id = $this->generateId('seguimientoDenuncias');
-    //     $seguimientoData = [
-    //         'id' => $id,
-    //         'denuncia_id' => null,
-    //         'estado' => $estado,
-    //         'comentario' => $comentario,
-    //         'fecha_actualizacion' => date('Y-m-d H:i:s'),
-    //         'dni_admin' => $dni_admin
-    //     ];
-
-    //     $denuncia = $this->denunciasModel->receiveDenuncia($code, $dni_admin, $estado, $comentario, $seguimientoData);
-
-    //     if (!$denuncia) {
-    //         return $this->response->setJSON([
-    //             'success' => false,
-    //             'message' => 'Error al insertar el seguimiento de la denuncia'
-    //         ]);
-    //     }
-
-    //     $correo = $this->denunciantesModel
-    //         ->select('email')
-    //         ->where('id', $denuncia['denunciante_id'])
-    //         ->first();
-
-    //     if ($correo) {
-    //         $this->correo($correo['email'], $code, $estado, $comentario);
-    //     }
-
-    //     return $this->response->setJSON([
-    //         'success' => true,
-    //         'message' => 'La denuncia recibida'
-    //     ]);
-    // }
 
     public function receiveAdmin()
     {
@@ -127,15 +87,7 @@ class GestionAdminController extends ResourceController
             'message' => 'La denuncia recibida'
         ]);
     }
-    // public function receivedAdmin()
-    // {
-    //     $data = $this->request->getGet();
-    //     $dni_admin = $data['dni_admin'];
-
-    //     $denuncias = $this->denunciasModel->getReceivedAdminData($dni_admin);
-
-    //     return $this->response->setJSON($denuncias);
-    // }
+    
     public function receivedAdmin()
     {
         $denuncias = $this->denunciasModel->getReceivedAdminData();
