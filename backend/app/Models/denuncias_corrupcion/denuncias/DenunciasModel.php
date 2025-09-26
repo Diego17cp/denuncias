@@ -131,7 +131,7 @@ class DenunciasModel extends Model
             ->update();
 
         // Use SeguimientoDenunciasModel to insert seguimiento
-        $seguimientoModel = new \App\Models\Denuncias\SeguimientoDenunciasModel();
+        $seguimientoModel = new \App\Models\denuncias_corrupcion\Denuncias\SeguimientoDenunciasModel();
         $seguimientoData = [
             'denuncia_id'     => $denuncia['id'],
             'comentario'      => $comentario,
@@ -145,33 +145,7 @@ class DenunciasModel extends Model
         return $this->db->transStatus() ? $denuncia : false;
     }
 
-    // public function getReceivedAdminData($dniAdmin)
-    // {
-    //     return $this
-    //         ->select('
-    //             denuncias.tracking_code, 
-    //             denuncias.estado, 
-    //             denuncias.fecha_registro, 
-    //             denuncias.fecha_incidente,
-    //             denuncias.descripcion,
-    //             denuncias.motivo_otro,
-    //             COALESCE(denunciantes.nombres, "Anónimo") as denunciante_nombre, 
-    //             COALESCE(denunciantes.numero_documento, "00000000") as denunciante_dni, 
-    //             denunciados.nombre as denunciado_nombre, 
-    //             denunciados.numero_documento as denunciado_dni, 
-    //             motivos.nombre as motivo,
-    //             seguimiento_denuncias.estado as seguimiento_estado,
-    //             seguimiento_denuncias.comentario as seguimiento_comentario
-    //         ')
-    //         ->join('denunciantes', 'denuncias.denunciante_id = denunciantes.id', 'left')
-    //         ->join('denunciados', 'denuncias.denunciado_id = denunciados.id')
-    //         ->join('motivos', 'denuncias.motivo_id = motivos.id')
-    //         ->join('seguimiento_denuncias', 'denuncias.id = seguimiento_denuncias.denuncia_id', 'left')
-    //         ->where('denuncias.dni_admin', $dniAdmin)
-    //         ->whereIn('denuncias.estado', ['en proceso', 'recibida'])
-    //         ->groupBy('denuncias.id')
-    //         ->findAll();
-    // }
+
 
     public function getReceivedAdminData()
 {
@@ -188,7 +162,7 @@ class DenunciasModel extends Model
             denunciado.nombre as denunciado_nombre,
             denunciado.documento as denunciado_dni,
             motivo.nombre as motivo,
-            seguimiento_denuncia.comentario as seguimiento_comentario
+            MAX(seguimiento_denuncia.comentario) as seguimiento_comentario
         ')
         ->join('denunciante', 'denuncia.denunciante_id = denunciante.id', 'left')
         ->join('denunciado', 'denuncia.denunciado_id = denunciado.id', 'left')
